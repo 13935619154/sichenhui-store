@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+	"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="cn.tedu.store.mapper.FavoriteMapper">
+
+	<resultMap type="cn.tedu.store.entity.Favorite" id="FavoriteEntityMap">
+		<id column="fid" property="fid"/>
+		<result column="created_user" property="createdUser"/>
+		<result column="created_time" property="createdTime"/>
+		<result column="modified_user" property="modifiedUser"/>
+		<result column="modified_time" property="modifiedTime"/>
+	</resultMap>
+
+	<!-- 插入收藏数据 -->
+	<!-- Integer insert(Favorite favorite) -->
+	<insert id="insert">
+		INSERT INTO t_favorite (
+			uid, pid,
+			created_user, created_time, modified_user, modified_time
+		) VALUES (
+			#{uid}, #{pid},
+			#{createdUser}, #{createdTime}, #{modifiedUser}, #{modifiedTime}
+		)
+	</insert>
+	
+	<!-- 删除收藏 -->
+	<!-- Integer deleteByFid(Integer fid) -->
+	<delete id="deleteByFid">
+		DELETE FROM t_favorite WHERE fid=#{fid}
+	</delete>
+	
+	<!-- 统计某用户收藏商品的数量 -->
+	<!-- Integer countByUid(Integer uid) -->
+	<select id="countByUid" resultType="java.lang.Integer">
+		SELECT
+			COUNT(*)
+		FROM
+			t_favorite
+		WHERE
+			uid=#{uid}
+	</select>
+	
+	<!-- 根据收藏数据的id查询收藏数据的详情 -->
+	<!-- Favorite findByFid(Integer fid) -->
+	<select id="findByFid" resultMap="FavoriteEntityMap">
+		SELECT 
+			* 
+		FROM 
+			t_favorite
+		WHERE 
+			fid=#{fid}
+	</select>
+	
+	<!-- 查询某用户的收藏的某商品的详情 -->
+	<!-- Favorite findByUidAndPid(
+		@Param("uid") Integer uid, 
+		@Param("pid") Integer pid
+	) -->
+	<select id="findByUidAndPid" resultMap="FavoriteEntityMap">
+		SELECT 
+			* 
+		FROM 
+			t_favorite
+		WHERE 
+			uid=#{uid} AND pid=#{pid}
+	</select>
+	
+	<!-- 分页查询某用户的收藏列表 -->
+	<!-- List<Favorite> findByUid(
+		@Param("uid") Integer uid, 
+		@Param("offset") Integer offset, 
+		@Param("count") Integer count
+	); -->
+	<select id="findByUid" resultMap="FavoriteEntityMap">
+		SELECT 
+			* 
+		FROM 
+			t_favorite
+		WHERE 
+			uid=#{uid}
+		ORDER BY
+			fid DESC
+		LIMIT
+			#{offset}, #{count}
+	</select>
+	
+	<!-- 分页查询某用户的收藏列表 -->
+	<!-- List<Favorite> findVOByUid(
+		@Param("uid") Integer uid, 
+		@Param("offset") Integer offset, 
+		@Param("count") Integer count
+	); -->
+	<select id="findVOByUid" resultType="cn.tedu.store.vo.FavoriteVO">
+		SELECT 
+			fid, pid, uid,
+			title, image, price
+		FROM 
+			t_favorite
+		LEFT JOIN
+			t_product
+		ON
+			t_favorite.pid=t_product.id
+		WHERE 
+			uid=#{uid}
+		ORDER BY
+			fid DESC
+		LIMIT
+			#{offset}, #{count}
+	</select>
+	
+</mapper>
+
+
+
+
+
+
+
